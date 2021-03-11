@@ -23,7 +23,12 @@ import gallery from './gallery-items.js';
 
 const ulRef = document.querySelector('.js-gallery');
 const galleryMarkup = createGalleryMarkup(gallery);
-ulRef.insertAdjacentHTML('beforeend', galleryMarkup);
+const modalRef = document.querySelector('.js-lightbox');
+const modalImgRef = document.querySelector('.lightbox__image');
+const closeBtnRef = document.querySelector('.lightbox__button');
+const overlayRef = document.querySelector('.lightbox__overlay');
+
+let index = 0;
 
 function createGalleryMarkup(gallery) {
     return gallery.map(({preview,original,description}) => {
@@ -43,3 +48,40 @@ function createGalleryMarkup(gallery) {
     </li>`;
     }).join('');
 };
+
+ulRef.insertAdjacentHTML('beforeend', galleryMarkup);
+
+const onModalOpen = (e) => {
+  e.preventDefault();
+  if (e.target.nodeName === 'IMG') {
+    modalImgRef.src = e.target.dataset.source;
+    modalRef.classList.add('is-open');
+    index = +e.target.dataset.index;
+    window.addEventListener('keydown', onKeyboard);
+  }
+};
+
+function removeAtributes() {
+    modalRef.classList.remove('is-open');
+    modalImgRef.src = '';
+    window.removeEventListener('keydown', onKeyboard);
+};
+
+const onCloseBtn = () => {
+    removeAtributes();
+};
+
+const onOverlayClose = () => {
+    removeAtributes();
+};
+
+const onKeyboard = e => {
+  if (e.key === 'Escape') {
+      removeAtributes();
+  }
+
+};
+
+ulRef.addEventListener('click', onModalOpen);
+closeBtnRef.addEventListener('click', onCloseBtn);
+overlayRef.addEventListener('click', onOverlayClose);
